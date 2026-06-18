@@ -1,4 +1,4 @@
-````md
+
 # Software Engineering Lab
 
 A structured practice repository for building software engineering fundamentals through weekly labs, projects, and architecture exercises.
