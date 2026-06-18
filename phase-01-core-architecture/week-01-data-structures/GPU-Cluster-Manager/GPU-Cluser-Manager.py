@@ -51,11 +51,18 @@ class GPUClusterManager:
     def get_all_nodes(self):
         return self._available_gpus #WHOLE DICTIONARY!
 
+    def get_drained_nodes(self):
+        drained_nodes = {}
+        for node in self._available_gpus:
+            if self._available_gpus[node].get_status() == "draining":
+                drained_nodes[self._available_gpus[node].get_node_id()] = self._available_gpus[node]
+        return drained_nodes
+
     def get_idle_nodes(self):
         idle_nodes = {}
         for node in self._available_gpus:
-            if self._available_gpus[node].get_status != "draining":
-                idle_nodes[self._available_gpus[node].get_node_id] = self._available_gpus[node]
+            if self._available_gpus[node].get_status()== "idle":
+                idle_nodes[self._available_gpus[node].get_node_id()] = self._available_gpus[node]
         return idle_nodes
 
 def show_choices():
@@ -87,7 +94,7 @@ def main():
             case 1: #works
                 GPU_count = int(input("How many GPUs would you like to create? "))
                 for i in range(GPU_count):
-                    node_id = random.randint(00000, 10000)
+                    node_id = random.randint(0, 10000)
 
                     while True:
                         try:
@@ -131,22 +138,22 @@ def main():
                     node_id = int(input("Please enter the node_ID you'd like to drain: "))
                     success = gpu_manager.drain_node(node_id)
                     if success:
-                        print("GPU drained...")
+                        print("GPU drained.")
                     else:
                         print("GPU could not be drained. Please try again.")
 
             case 4:
-                idle_nodes = gpu_manager.get_idle_nodes()
-                if len(idle_nodes) == 0:
+                drained_nodes = gpu_manager.get_drained_nodes()
+                if len(drained_nodes) == 0:
                     print("There are no nodes to delete!")
 
                 else:
-                    for node in idle_nodes:
-                        print(f"Node ID: {idle_nodes[node].get_node_id()} | VRAM: {idle_nodes[node].get_vram()} GB | Status: {idle_nodes[node].get_status()}")
-                    node_id = int(input("Please enter the node_ID you'd like to drain: "))
+                    for node in drained_nodes:
+                        print(f"Node ID: {drained_nodes[node].get_node_id()} | VRAM: {drained_nodes[node].get_vram()} GB | Status: {drained_nodes[node].get_status()}")
+                    node_id = int(input("Please enter the node_ID you'd like to remove: "))
                     success = gpu_manager.remove_node(node_id)
                     if success:
-                        print("GPU drained...")
+                        print("GPU removed.")
                     else:
                         print("GPU could not be removed.\n"
                               "Note: GPU's cannot be removed unless they are drained!"
